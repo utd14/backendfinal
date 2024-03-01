@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Page</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+  body {
+    background-color: #d1dfff;
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+    max-width: 600px; 
+    margin: auto; 
+    background-color: #ffffff; 
+    padding: 20px; 
+    margin-top: 20px; 
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+  }
+
+  nav {
+    background-color: #ffffff; 
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #000000;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+    background-color: #ffffff; 
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+  }
+
+  .contributions-container, .item, .profile {
+    background-color: #ffffff; 
+    padding: 10px;
+    margin-bottom: 20px; 
+    border-radius: 8px; 
+    max-height: 300px;
+    overflow-y: auto; 
+    border: 1px solid #ccc;
+    margin: 10px 0;
+  }
+
+  .edit-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .activity-graph {
+    max-width: 600px; 
+    display: block; 
+    margin: auto; 
+    width: 100%; 
+}
+
+.profile {
+    display: flex; 
+    align-items: center;
+    background-color: #ffffff; 
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    border-radius: 50%; 
+}
+
+.profile-details {
+    max-width: calc(100% - 120px); 
+}
+
+.profile-details h2, .profile-details p {
+    margin: 0; 
+    padding: 4px 0; 
+}
+
+.profile-details ul {
+    list-style: none; 
+    padding: 0; 
+}
+
+.profile-details li {
+    background-color: #f0f0f0; 
+    margin-bottom: 5px; 
+    padding: 5px 10px; 
+    border-radius: 5px; 
+}
+  </style>
+</head>
+<body>
+    <nav>
+        <a href="/home?token=<%= token %>">Home</a>
+        <% if (role === 'admin') { %>
+          <a href="/admin?token=<%= token %>">Edit Portfolio</a> 
+      <% } %>
+      <a href="/login">Log Out</a>
+      </nav>
+
+      <div class="container">
+  <h1>My Potfolio. Welcome!</h1>
+
+
+<hr>
+
+<div class="profile">
+    <img src="<%= profile.basics.image %>" alt="Profile Image" class="profile-image">
+
+    <div class="profile-details">
+        <h2>GitHub Name: <%= profile.basics.name %></h2>
+        <p><%= profile.basics.label %> - <%= profile.basics.summary %></p>
+        <p>Followers: <%= profile.basics.followers %>, Following: <%= profile.basics.following %></p>
+      
+
+        <% if (profile.skills && profile.skills.length > 0) { %>
+          <h2>Skills</h2>
+          <ul>
+            <% profile.skills.forEach(function(skill) { %>
+              <li><%= skill.name %>: <%= skill.level %></li>
+            <% }); %>
+          </ul>
+        <% } %>
+    </div>
+</div>
+
+<hr>
+
+  <% if (github.user.contributionsCollection) { %>
+    <h3>GitHub Contributions</h3>
+    <a href="https://github.com/ashutosh00710/github-readme-activity-graph">
+        <img src="https://github-readme-activity-graph.vercel.app/graph?username=utd14&bg_color=d1dfff&color=9e4c98&line=9e4c98&point=403d3d&area=true&hide_border=true" alt="Ashutosh's github activity graph" class="activity-graph">
+    </a>    
+    <div class="contributions-container">
+      <% github.user.contributionsCollection.contributionCalendar.weeks.forEach((week) => { %>
+        <% week.contributionDays.forEach((day) => { %>
+          <% if (day.contributionCount > 0) { %> <!-- Check if contributions are above 0 -->
+            <div>
+              <span>Date: <%= day.date %>, Contributions: <%= day.contributionCount %></span>
+            </div>
+          <% } %> <!-- End of contribution count check -->
+        <% }); %>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <hr>
+
+<h3>Blog Posts</h3>
+<% items.forEach(function(item) { %>
+    <div class="item">
+        <h2><%= item.title %></h2>
+        <hr>
+        <div id="carousel<%= item._id %>" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <% item.images.forEach(function(image, index) { %>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                        <img src="<%= image %>" class="d-block w-100" alt="...">
+                    </div>
+                <% }); %>
+            </div>
+            <a class="carousel-control-prev" href="#carousel<%= item._id %>" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carousel<%= item._id %>" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+        <p><%= item.description %></p>
+
+        <hr>
+        <div>Created at: <%= item.createdAt.toDateString() %></div>
+        <div>Languages: <%= item.languages.join(', ') %></div>
+    </div>
+<% }); %>
+</div>
+
+<footer>
+    Dana Uteusheva &bullet; IT-2202
+  </footer>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
